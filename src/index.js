@@ -16,26 +16,30 @@ refs.input.addEventListener(
     const inputValue = e.target.value.trim();
     fetchCountries(inputValue)
       .then(countries => renderCountriesList(countries))
-      .catch(error => Notify.failure(`❌ ${error} Oops, there is no country with that name`));
+      .catch(error => {
+        refs.ulItems.innerHTML = '';
+        Notify.failure(`❌ ${error} Oops, there is no country with that name`);
+      });
   }, DEBOUNCE_DELAY),
 );
-// fetchCountries(name);
 
 function renderCountriesList(countries) {
-  console.log('~ countries', countries);
+  if (countries.length > 10) {
+    Notify.success(`Too many matches found. Please enter a more specific name`);
+    return;
+  }
 
   const markup = countries
     .map(({ capital, flags: { svg }, languages, name: { official }, population }) => {
       if (countries.length === 1) {
-        console.log(capital, svg, languages, official, population);
-        // return `<li><svg class="flag" width="120px"><use href="${svg}"></use></svg><p>${official}</p></li>`;
         return `<li class="li"><div class="country"><img class="icon" src="${svg}" width="40px"><H3>${official}</H3></div><p><b>Capital:</b> ${capital}</p><p><b>Population:</b> ${population}</p><p><b>language:</b> ${Object.values(
           languages,
         )}</p></li>`;
       }
-      return `<li class="country"><svg class="flag" width="20px" height="20px"><use href="${svg}"></use></svg>${official}</li>`;
+
+      return `<li class="country"><img class="icon" src="${svg}" width="40px"><H4>${official}</H4></li>`;
     })
     .join('');
+
   refs.ulItems.innerHTML = markup;
-  console.log('~ markup', markup);
 }
